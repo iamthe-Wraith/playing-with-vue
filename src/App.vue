@@ -1,8 +1,24 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import type { Task } from './types';
 import TaskForm from './components/TaskForm.vue';
+import TaskList from './components/TaskList.vue';
+
+const tasks = ref<Task[]>([]);
 
 const addTask = (newTask: string) => {
-  console.log('new task added! ', newTask);
+  tasks.value.push({
+    id: crypto.randomUUID(),
+    title: newTask,
+    completed: false,
+  });
+};
+
+const toggleComplete = (taskId: string) => {
+  const task = tasks.value.find((task) => task.id === taskId);
+  if (task) {
+    task.completed = !task.completed;
+  }
 };
 </script>
 
@@ -12,6 +28,11 @@ const addTask = (newTask: string) => {
 
     <!-- listen for the addTask event from this component -->
     <TaskForm @add-task="addTask" />
+
+    <div v-if="!tasks.length">Add a task to get started!</div>
+    <div v-else>0 / {{ tasks.length }} Tasks Completed</div>
+
+    <TaskList :tasks="tasks" @toggle-complete="toggleComplete" />
   </main>
 </template>
 

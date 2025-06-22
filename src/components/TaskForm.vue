@@ -8,10 +8,16 @@ const emit = defineEmits<{
 }>();
 
 const newTask = ref('');
+const error = ref('');
 
 const onSubmit = () => {
+    if (!newTask.value.trim()) {
+        error.value = 'Task cannot be empty';
+        return;
+    }
+
     // emit the addTask event with the newTask value
-    emit('addTask', newTask.value);
+    emit('addTask', newTask.value.trim());
     newTask.value = '';
 };
 </script>
@@ -21,7 +27,15 @@ const onSubmit = () => {
     <form @submit.prevent="onSubmit">
         <div class="form-group">
             <label for="newTask">New Task</label>
-            <input type="text" id="newTask" v-model="newTask" />
+            <input
+                type="text"
+                id="newTask"
+                v-model="newTask"
+                :aria-invalid="!!error || undefined"
+                @input="error = ''"
+            />
+            <!-- show the error message if there is an error -->
+            <p v-if="error" class="error">{{ error }}</p>
         </div>
 
         <button type="submit">Add Task</button>
