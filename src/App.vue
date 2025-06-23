@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Task } from './types';
 import TaskForm from './components/TaskForm.vue';
 import TaskList from './components/TaskList.vue';
 
 const tasks = ref<Task[]>([]);
+const totalCompleted = computed(() => tasks.value.filter(t => t.completed).length);
 
 const addTask = (newTask: string) => {
   tasks.value.push({
@@ -13,6 +14,10 @@ const addTask = (newTask: string) => {
     completed: false,
   });
 };
+
+const removeTask = (taskId: string) => {
+  tasks.value = tasks.value.filter((task) => task.id !== taskId);
+}
 
 const toggleComplete = (taskId: string) => {
   const task = tasks.value.find((task) => task.id === taskId);
@@ -30,9 +35,13 @@ const toggleComplete = (taskId: string) => {
     <TaskForm @add-task="addTask" />
 
     <div v-if="!tasks.length">Add a task to get started!</div>
-    <div v-else>0 / {{ tasks.length }} Tasks Completed</div>
+    <div v-else>{{ totalCompleted }} / {{ tasks.length }} Tasks Completed</div>
 
-    <TaskList :tasks="tasks" @toggle-complete="toggleComplete" />
+    <TaskList
+      :tasks="tasks"
+      @toggle-complete="toggleComplete"
+      @remove-task="removeTask"
+    />
   </main>
 </template>
 
